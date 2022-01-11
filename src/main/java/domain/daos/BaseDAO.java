@@ -70,8 +70,8 @@ public abstract class BaseDAO<T> {
         getCurrentSession().update(entity);
     }
 
-    public T findById(String id) {
-        return (T) getCurrentSession().get(this.type, id);
+    public T findById(Long id) {
+        return getCurrentSession().get(this.type, id);
     }
 
     public void delete(T entity) {

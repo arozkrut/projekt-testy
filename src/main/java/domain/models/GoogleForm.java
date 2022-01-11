@@ -5,6 +5,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
+// TODO: think about changing json field
+
 @Getter
 @Setter
 @Entity
@@ -12,7 +14,7 @@ import javax.persistence.*;
 public class GoogleForm {
     @Id
     @Column(name = "ID")
-    private Integer id;
+    private Long id;
 
     @Lob
     @Column(name = "JSON")
