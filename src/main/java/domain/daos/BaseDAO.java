@@ -2,91 +2,90 @@ package domain.daos;
 
 import java.util.List;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.transaction.Transactional;
 
 public abstract class BaseDAO<T> {
-    private Session currentSession;
-    private Transaction currentTransaction;
+    @Inject
+    EntityManager entityManager;
+
     private final Class<T> type;
-    private final String className;
 
-    public BaseDAO(Class<T> type, String className) {
+    public BaseDAO(Class<T> type) {
         this.type = type;
-        this.className = className;
     }
 
-    public Session openCurrentSession() {
-        currentSession = getSessionFactory().openSession();
-        return currentSession;
+    @Transactional
+    public T create(T entity) throws Exception {
+        try {
+            entityManager.persist(entity);
+            entityManager.flush();
+            return entity;
+        }
+        catch (Exception e){
+            throw new Exception("Couldn't create entity.");
+        }
     }
 
-    public Session openCurrentSessionWithTransaction() {
-        currentSession = getSessionFactory().openSession();
-        currentTransaction = currentSession.beginTransaction();
-        return currentSession;
+    @Transactional
+    public T update(T entity) throws Exception {
+        try {
+            entityManager.merge(entity);
+            entityManager.flush();
+            return entity;
+        }
+        catch (Exception e){
+            throw new Exception("Couldn't update entity.");
+        }
     }
 
-    public void closeCurrentSession() {
-        currentSession.close();
+    @Transactional
+    public T findById(Long id) throws Exception {
+        try {
+            return entityManager.find(type, id);
+        }
+        catch (Exception e){
+            throw new Exception("Couldn't find entity with given id.");
+        }
     }
 
-    public void closeCurrentSessionWithTransaction() {
-        currentTransaction.commit();
-        currentSession.close();
+    @Transactional
+    public void delete(T entity) throws Exception {
+        try {
+            entityManager.remove(entity);
+        }
+        catch (Exception e){
+            throw new Exception("Couldn't delete entity.");
+        }
     }
 
-    private static SessionFactory getSessionFactory() {
-        Configuration configuration = new Configuration().configure();
-        StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder()
-                .applySettings(configuration.getProperties());
-        return configuration.buildSessionFactory(builder.build());
+    @Transactional
+    public List<T> findAll() throws Exception {
+        try {
+            CriteriaQuery<T> cq = entityManager.getCriteriaBuilder().createQuery(type);
+            cq.from(type);
+            cq.distinct(true);
+            TypedQuery<T> query = entityManager.createQuery(cq);
+            return query.getResultList();
+        }
+        catch (Exception e){
+            throw new Exception("Couldn't find all entities.");
+        }
     }
 
-    public Session getCurrentSession() {
-        return currentSession;
-    }
-
-    public void setCurrentSession(Session currentSession) {
-        this.currentSession = currentSession;
-    }
-
-    public Transaction getCurrentTransaction() {
-        return currentTransaction;
-    }
-
-    public void setCurrentTransaction(Transaction currentTransaction) {
-        this.currentTransaction = currentTransaction;
-    }
-
-    public void persist(T entity) {
-        getCurrentSession().save(entity);
-    }
-
-    public void update(T entity) {
-        getCurrentSession().update(entity);
-    }
-
-    public T findById(Long id) {
-        return getCurrentSession().get(this.type, id);
-    }
-
-    public void delete(T entity) {
-        getCurrentSession().delete(entity);
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<T> findAll() {
-        return (List<T>) getCurrentSession().createQuery("from " + className).list();
-    }
-
-    public void deleteAll() {
-        List<T> entityList = findAll();
-        for (T entity : entityList) {
-            delete(entity);
+    @Transactional
+    public void deleteAll() throws Exception {
+        try {
+            List<T> entityList = findAll();
+            for (T entity : entityList) {
+                delete(entity);
+            }
+        }
+        catch (Exception e){
+            throw new Exception("Couldn't delete all entities.");
         }
     }
 }

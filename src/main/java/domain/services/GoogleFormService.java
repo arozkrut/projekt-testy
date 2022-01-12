@@ -3,58 +3,46 @@ package domain.services;
 import domain.daos.GoogleFormDAO;
 import domain.models.GoogleForm;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.transaction.Transactional;
 import java.util.List;
 
 // TODO: add method with criteria
 
+@ApplicationScoped
 public class GoogleFormService {
+    @Inject
+    GoogleFormDAO googleFormDAO;
 
-    private static GoogleFormDAO googleFormDAO;
-
-    public GoogleFormService() {
-        googleFormDAO = new GoogleFormDAO();
+    @Transactional
+    public GoogleForm create(GoogleForm entity) throws Exception {
+        return googleFormDAO.create(entity);
     }
 
-    public void persist(GoogleForm entity) {
-        googleFormDAO.openCurrentSessionWithTransaction();
-        googleFormDAO.persist(entity);
-        googleFormDAO.closeCurrentSessionWithTransaction();
+    @Transactional
+    public GoogleForm update(GoogleForm entity) throws Exception {
+         return googleFormDAO.update(entity);
     }
 
-    public void update(GoogleForm entity) {
-        googleFormDAO.openCurrentSessionWithTransaction();
-        googleFormDAO.update(entity);
-        googleFormDAO.closeCurrentSessionWithTransaction();
+    @Transactional
+    public GoogleForm findById(Long id) throws Exception {
+        return googleFormDAO.findById(id);
     }
 
-    public GoogleForm findById(Long id) {
-        googleFormDAO.openCurrentSession();
-        GoogleForm googleForm = googleFormDAO.findById(id);
-        googleFormDAO.closeCurrentSession();
-        return googleForm;
-    }
-
-    public void delete(Long id) {
-        googleFormDAO.openCurrentSessionWithTransaction();
+    @Transactional
+    public void delete(Long id) throws Exception {
         GoogleForm googleForm = googleFormDAO.findById(id);
         googleFormDAO.delete(googleForm);
-        googleFormDAO.closeCurrentSessionWithTransaction();
     }
 
-    public List<GoogleForm> findAll() {
-        googleFormDAO.openCurrentSession();
-        List<GoogleForm> books = googleFormDAO.findAll();
-        googleFormDAO.closeCurrentSession();
-        return books;
+    @Transactional
+    public List<GoogleForm> findAll() throws Exception {
+        return googleFormDAO.findAll();
     }
 
-    public void deleteAll() {
-        googleFormDAO.openCurrentSessionWithTransaction();
+    @Transactional
+    public void deleteAll() throws Exception {
         googleFormDAO.deleteAll();
-        googleFormDAO.closeCurrentSessionWithTransaction();
-    }
-
-    public GoogleFormDAO googleFormDAO() {
-        return googleFormDAO;
     }
 }
