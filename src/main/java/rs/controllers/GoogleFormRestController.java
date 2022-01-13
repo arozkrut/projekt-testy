@@ -19,6 +19,8 @@ import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.List;
 
 @Path("/form")
 @ApplicationScoped
@@ -64,6 +66,42 @@ public class GoogleFormRestController {
         }
         catch (Exception e){
             throw new NotFoundException("Form with given id doesn't exist");
+        }
+    }
+
+    @GET
+    @Path("/")
+    @Operation(
+            operationId = "getAllForms",
+            description = "Get all forms."
+    )
+    @APIResponses({
+            @APIResponse(
+                    responseCode = "200",
+                    description = "All forms.",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = List.class))
+            ),
+            @APIResponse(
+                    responseCode = "404",
+                    description = "Forms were not found"
+            )
+    })
+    public Response getAllForms() {
+        try {
+            List <GoogleFormDTO> googleFormList = new ArrayList<>();
+            for(GoogleForm form : googleFormService.findAll()){
+                googleFormList.add(googleFormMapper.mapToDTO(form));
+            }
+
+            return Response
+                    .status(Response.Status.OK)
+                    .type(MediaType.APPLICATION_JSON_TYPE)
+                    .entity(googleFormList)
+                    .build();
+        }
+        catch (Exception e){
+            throw new NotFoundException("Forms were not found");
         }
     }
 
