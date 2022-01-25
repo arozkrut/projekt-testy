@@ -8,6 +8,8 @@ import javax.validation.constraints.NotNull;
 
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 public class GoogleFormDTO {
@@ -22,4 +24,10 @@ public class GoogleFormDTO {
     @NotBlank
     @Schema(description = "Name of the form")
     private String name;
+
+    @Schema(description = "Date when the exam is supposed to start.")
+    private LocalDateTime startDate;
+
+    @Schema(description = "Date when the exam is supposed to end.")
+    private LocalDateTime endDate;
 }

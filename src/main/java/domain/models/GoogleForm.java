@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 // TODO: think about changing json field
 
@@ -24,4 +25,10 @@ public class GoogleForm {
 
     @Column(name = "NAME")
     private String name;
+
+    @Column(name = "START_DATE")
+    private LocalDateTime startDate;
+
+    @Column(name = "END_DATE")
+    private LocalDateTime endDate;
 }

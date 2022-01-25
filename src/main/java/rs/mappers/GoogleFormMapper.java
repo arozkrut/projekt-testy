@@ -8,8 +8,6 @@ import org.mapstruct.MappingTarget;
 import rs.models.GoogleFormCreateDTO;
 import rs.models.GoogleFormDTO;
 
-import javax.enterprise.context.ApplicationScoped;
-
 @Mapper(componentModel = "cdi", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface GoogleFormMapper {
     GoogleFormDTO mapToDTO(GoogleForm googleForm);
